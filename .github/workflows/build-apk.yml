@@ -27,7 +27,7 @@ jobs:
       - name: Extraire le projet v0.3.0
         id: source
         run: |
-          ZIP_FILE="./EYE-OF-GOD-v0.3.0.zip"
+          ZIP_FILE="./eog.zip"
 
           if [ ! -f "$ZIP_FILE" ]; then
             echo "ZIP v0.3.0 introuvable"
