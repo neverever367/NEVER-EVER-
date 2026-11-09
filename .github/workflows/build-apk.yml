@@ -19,32 +19,34 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Installer Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
       - name: Installer Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.7"
 
-      - name: Extraire le projet ZIP
+      - name: Extraire le projet v0.3.0
         id: source
         run: |
-          ZIP_FILE="$(find . -type f -iname '*.zip' -not -path './.git/*' | head -n 1)"
-          if [ -z "$ZIP_FILE" ]; then
-            echo "Aucun fichier ZIP trouve"
+          ZIP_FILE="./EYE-OF-GOD-v0.3.0.zip"
+
+          if [ ! -f "$ZIP_FILE" ]; then
+            echo "ZIP v0.3.0 introuvable"
             exit 1
           fi
+
           mkdir -p extracted
           unzip -q "$ZIP_FILE" -d extracted
-          PROJECT_DIR="$(find extracted -name settings.gradle.kts -printf '%h\n' | head -n 1)"
+
+          PROJECT_DIR="$(find extracted -type f \( -name settings.gradle -o -name settings.gradle.kts \) -printf '%h\n' | head -n 1)"
+
           if [ -z "$PROJECT_DIR" ]; then
             echo "Projet Android introuvable"
+            find extracted -maxdepth 5 -type f
             exit 1
           fi
+
           echo "project_dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+          echo "Projet trouve : $PROJECT_DIR"
 
       - name: Compiler APK
         run: |
@@ -53,7 +55,8 @@ jobs:
       - name: Recuperer APK
         uses: actions/upload-artifact@v4
         with:
-          name: EYE-OF-GOD-apk
+          name: EYE-OF-GOD-v0.3.0-apk
           path: extracted/**/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          
           
